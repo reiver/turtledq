@@ -7,6 +7,8 @@ import (
 	"github.com/vaughan0/go-zmq"
 	"log"
 	"log/syslog"
+	"math/rand"
+	"time"
 )
 
 
@@ -25,6 +27,10 @@ func main() {
 	//DEBUG
 	syslogLog.Notice("=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=")
 	syslogLog.Notice("TurtleDQ Server BEGIN.")
+
+
+	// Go!
+		go dequeue(syslogLog)
 
 
 	// Create ZeroMQ context.
@@ -53,8 +59,6 @@ func main() {
 
 
 
-		quit := make(chan struct{})
-
 		for {
 			select {
 
@@ -66,10 +70,6 @@ func main() {
 
 				case err := <-chans.Errors():
 					panic(err)
-
-				case <-quit:
-		/////// BREAK
-				break;
 
 			} // select
 		}
@@ -91,4 +91,34 @@ func handleRequest(syslogLog *syslog.Writer, msg [][]byte) [][]byte {
 		return [][]byte{
 			[]byte("apple banana cherry"),
 		}
+}
+
+
+func dequeue(syslogLog *syslog.Writer) {
+
+	//DEBUG
+	syslogLog.Notice("[dequeue] BEGIN")
+
+
+	// Forever
+		for {
+
+			//DEBUG
+			syslogLog.Notice("    [dequeue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=")
+			syslogLog.Notice("    [dequeue] loop")
+
+
+
+			sleepTime := time.Duration(5 + rand.Intn(7)) * time.Second
+
+			//DEBUG
+			syslogLog.Notice( fmt.Sprintf("    [dequeue] sleep for %v", sleepTime) )
+
+			time.Sleep(sleepTime)
+		} // for
+
+
+	//DEBUG
+	syslogLog.Notice("[dequeue] END")
+
 }
