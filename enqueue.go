@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/streadway/amqp"
+//	"github.com/streadway/amqp"
 	"log/syslog"
 	"math/rand"
 	"time"
