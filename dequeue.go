@@ -6,6 +6,7 @@ import (
 	"fmt"
 //	"github.com/streadway/amqp"
 	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log/syslog"
 	"math/rand"
 	"time"
@@ -59,6 +60,10 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 		session.SetMode(mgo.Monotonic, true)
 
 
+
+		mongoCollection := session.DB(mongoDatabaseName).C(mongoCollectionName)
+
+
 	// Forever
 		for {
 
@@ -70,6 +75,19 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 
 			// Check MongoDB for items that are ready.
+				mongoCriteria := bson.M{  "when":bson.M{"$lte": bson.Now()}  }
+
+				mongoQuery := mongoCollection.Find(mongoCriteria)
+
+				//DEBUG
+				syslogLog.Notice( fmt.Sprintf("    [dequeue] mongoQuery = [%v]", mongoQuery) )
+				
+
+//				if nil != err {
+//					syslogLog.Err( fmt.Sprintf("    [dequeue] Error querying MongoDB with mongoCriteria = [%v] received err = [%v]", mongoCriteria, err) )
+//				} else {
+//
+//				}
 
 
 
