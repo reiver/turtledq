@@ -73,6 +73,7 @@ func main() {
 
 	// Go!
 		go dequeue(syslogLog)
+		go enqueue(syslogLog)
 
 
 	// Create ZeroMQ context.
