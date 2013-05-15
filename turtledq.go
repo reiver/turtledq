@@ -19,7 +19,7 @@ func main() {
 	// Syslog
 		syslogLog, err :=syslog.New(syslog.LOG_INFO, "turtledq/server")
 		if nil != err {
-			log.Fatal("Crap on a stick, could not open up syslog!")
+			log.Fatal("Big problem, could not open up syslog!")
 /////////// RETURN
 			return
 		}
