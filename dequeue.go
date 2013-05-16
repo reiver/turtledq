@@ -14,11 +14,14 @@ import (
 
 
 
-func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string, amqpHref string) {
+func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string, amqpHref string, amqpExchange string, amqpExchangeType string) {
 
 	//DEBUG
 	syslogLog.Notice("[dequeue] BEGIN")
-	syslogLog.Notice(  fmt.Sprintf("    [dequeue] mongoHref = [%v]", mongoHref)  )
+	syslogLog.Notice(  fmt.Sprintf("    [dequeue]           mongoHref = [%v]", mongoHref)  )
+	syslogLog.Notice(  fmt.Sprintf("    [dequeue]   mongoDatabaseName = [%v]", mongoDatabaseName)  )
+	syslogLog.Notice(  fmt.Sprintf("    [dequeue] mongoCollectionName = [%v]", mongoCollectionName)  )
+	syslogLog.Notice(  fmt.Sprintf("    [dequeue]            amqpHref = [%v]", amqpHref)  )
 
 	// Deal with parameters.
 		if "" == mongoHref {
@@ -70,7 +73,7 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 		mongoCollection := mongoSession.DB(mongoDatabaseName).C(mongoCollectionName)
 
 		//DEBUG
-		syslogLog.Notice(  fmt.Sprintf("    [dequeue] Connect to MongoDB with %v.%v", mongoDatabaseName, mongoCollectionName)  )
+		syslogLog.Notice(  fmt.Sprintf("    [dequeue] Connected to MongoDB with %v.%v", mongoDatabaseName, mongoCollectionName)  )
 
 
 	// Connect to AMQP.
@@ -82,6 +85,22 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 			return
 		}
 		defer amqpConnection.Close()
+
+		amqpChannel, err := amqpConnection.Channel()
+		if err != nil {
+			syslogLog.Err("    [dequeue] Could NOT get AMQP channel")
+			panic(err)
+/////////////////////// RETURN
+			return
+		}
+
+		//DEBUG
+		syslogLog.Notice(  fmt.Sprintf("    [dequeue] amqpChannel = [%v]", amqpChannel)  )
+
+
+		//DEBUG
+		syslogLog.Notice(  fmt.Sprintf("    [dequeue] Connected to AMQP server (RabbitMQ?)", mongoDatabaseName, mongoCollectionName)  )
+
 
 
 	// Forever
@@ -118,6 +137,8 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 						//DEBUG
 						syslogLog.Err( fmt.Sprintf("        [dequeue] Received row: [%v]", x) )
+
+
 
 
 					} // for

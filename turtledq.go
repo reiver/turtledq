@@ -41,7 +41,15 @@ func main() {
 
 
 	// Go!
-		go dequeue(syslogLog, turtleConfig.DequeueMongoHref, turtleConfig.DequeueMongoDatabaseName, turtleConfig.DequeueMongoCollectionName, turtleConfig.DequeueAmqpHref)
+		go dequeue(
+			syslogLog,
+			turtleConfig.DequeueMongoHref,
+			turtleConfig.DequeueMongoDatabaseName,
+			turtleConfig.DequeueMongoCollectionName,
+			turtleConfig.DequeueAmqpHref,
+			turtleConfig.DequeueAmqpExchange,
+			turtleConfig.DequeueAmqpExchangeType)
+
 		go enqueue(syslogLog)
 
 
