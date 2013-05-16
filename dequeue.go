@@ -14,7 +14,7 @@ import (
 
 
 
-func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string, dequeueAmqpHref string) {
+func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string, amqpHref string) {
 
 	//DEBUG
 	syslogLog.Notice("[dequeue] BEGIN")
@@ -45,8 +45,8 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 			return
 		}
 
-		if "" == dequeueAmqpHref {
-			errMsg := fmt.Sprintf("    [dequeue] Bad dequeueAmqpHref. Received: [%v].", dequeueAmqpHref)
+		if "" == amqpHref {
+			errMsg := fmt.Sprintf("    [dequeue] Bad amqpHref. Received: [%v].", amqpHref)
 			syslogLog.Err(errMsg)
 			panic(errMsg)
 /////////////////////// RETURN
@@ -55,27 +55,40 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 
 	// Connect to MongoDB
-		session, err := mgo.Dial(mongoHref)
+		mongoSession, err := mgo.Dial(mongoHref)
 		if err != nil {
-			syslogLog.Err( fmt.Sprintf("    [dequeue] Could NOT connect to MongoDB at [%v], received err = [%v]", mongoHref, err) )
+			syslogLog.Err(  fmt.Sprintf("    [dequeue] Could NOT connect to MongoDB at [%v], received err = [%v]", mongoHref, err)  )
 			panic(err)
 /////////////////////// RETURN
 			return
 		}
-		defer session.Close()
+		defer mongoSession.Close()
 
 		// Optional. Switch the session to a monotonic behavior.
-		session.SetMode(mgo.Monotonic, true)
+		mongoSession.SetMode(mgo.Monotonic, true)
 
-		mongoCollection := session.DB(mongoDatabaseName).C(mongoCollectionName)
+		mongoCollection := mongoSession.DB(mongoDatabaseName).C(mongoCollectionName)
+
+		//DEBUG
+		syslogLog.Notice("    [dequeue] Connect to MongoDB with %v.%v", mongoDatabaseName, mongoCollectionName)
+
+
+	// Connect to AMQP.
+		amqpConnection, err := amqp.Dial(amqpHref)
+		if err != nil {
+			syslogLog.Err(  fmt.Sprintf("    [dequeue] Could NOT connect to AMQP server (RabbitMQ?) at [%v], received err = [%v]", amqpHref, err)  )
+			panic(err)
+/////////////////////// RETURN
+			return
+		}
+		defer amqpConnection.Close()
 
 
 	// Forever
 		for {
 
 			//DEBUG
-			syslogLog.Notice("    [dequeue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=")
-			syslogLog.Notice("    [dequeue] loop")
+			syslogLog.Notice("    [dequeue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-= LOOP")
 
 
 
@@ -95,6 +108,7 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 					syslogLog.Err( fmt.Sprintf("    [dequeue] Success querying MongoDB with mongoCriteria = [%v]", mongoCriteria, err) )
 
 					var x struct{
+						_Id    bson.ObjectId
 						When   time.Time
 						Target string
 					}
