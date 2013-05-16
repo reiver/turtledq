@@ -112,11 +112,11 @@ func NewTurtleConfigFromFile(syslogLog *syslog.Writer, configPath string) (*Turt
 			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].mongo_collection_name = [%v]", me.DequeueMongoCollectionName)  )
 		}
 
-		me.DequeueAmqpHref, err = c.GetString("dequeue", "dequeue_amqp_href")
+		me.DequeueAmqpHref, err = c.GetString("dequeue", "amqp_href")
 		if nil != err {
-			me.syslogLog.Notice("    [CONFIG] NO [deueue].dequeue_amqp_href")
+			me.syslogLog.Notice("    [CONFIG] NO [deueue].amqp_href")
 		} else {
-			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].dequeue_amqp_href = [%v]", me.DequeueAmqpHref)  )
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].amqp_href = [%v]", me.DequeueAmqpHref)  )
 		}
 
 
