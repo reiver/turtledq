@@ -93,30 +93,30 @@ func NewTurtleConfigFromFile(syslogLog *syslog.Writer, configPath string) (*Turt
 	// Get banal configs.
 		me.DequeueMongoHref, err = c.GetString("dequeue", "mongo_href")
 		if nil != err {
-			me.syslogLog.Notice("    [CONFIG] NO [deueue].mongo_href")
+			me.syslogLog.Notice("    [CONFIG] NO [dequeue].mongo_href")
 		} else {
-			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].mongo_href = [%v]", me.DequeueMongoHref)  )
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [dequeue].mongo_href = [%v]", me.DequeueMongoHref)  )
 		}
 
 		me.DequeueMongoDatabaseName, err = c.GetString("dequeue", "mongo_database_name")
 		if nil != err {
-			me.syslogLog.Notice("    [CONFIG] NO [deueue].mongo_database_name")
+			me.syslogLog.Notice("    [CONFIG] NO [dequeue].mongo_database_name")
 		} else {
-			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].mongo_database_name = [%v]", me.DequeueMongoDatabaseName)  )
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [dequeue].mongo_database_name = [%v]", me.DequeueMongoDatabaseName)  )
 		}
 
 		me.DequeueMongoCollectionName, err = c.GetString("dequeue", "mongo_collection_name")
 		if nil != err {
-			me.syslogLog.Notice("    [CONFIG] NO [deueue].mongo_collection_name")
+			me.syslogLog.Notice("    [CONFIG] NO [dequeue].mongo_collection_name")
 		} else {
-			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].mongo_collection_name = [%v]", me.DequeueMongoCollectionName)  )
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [dequeue].mongo_collection_name = [%v]", me.DequeueMongoCollectionName)  )
 		}
 
 		me.DequeueAmqpHref, err = c.GetString("dequeue", "amqp_href")
 		if nil != err {
-			me.syslogLog.Notice("    [CONFIG] NO [deueue].amqp_href")
+			me.syslogLog.Notice("    [CONFIG] NO [dequeue].amqp_href")
 		} else {
-			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].amqp_href = [%v]", me.DequeueAmqpHref)  )
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [dequeue].amqp_href = [%v]", me.DequeueAmqpHref)  )
 		}
 
 
