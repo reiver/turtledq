@@ -89,8 +89,8 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 					syslogLog.Err( fmt.Sprintf("    [dequeue] Success querying MongoDB with mongoCriteria = [%v]", mongoCriteria, err) )
 
 					var x struct{
-						when   time.Time
-						target string
+						When   time.Time
+						Target string
 					}
 
 					items := mongoQuery.Iter()
