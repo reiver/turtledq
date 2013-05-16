@@ -86,6 +86,8 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 					syslogLog.Err( fmt.Sprintf("    [dequeue] Error querying MongoDB with mongoCriteria = [%v] received err = [%v]", mongoCriteria, err) )
 				} else {
 
+					syslogLog.Err( fmt.Sprintf("    [dequeue] Success querying MongoDB with mongoCriteria = [%v]", mongoCriteria, err) )
+
 					var x struct{
 						when   time.Time
 						target string
@@ -95,12 +97,14 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 					for items.Next(&x) {
 
 						//DEBUG
-						syslogLog.Err( fmt.Sprintf("    [dequeue] Received row: [%v]", x) )
+						syslogLog.Err( fmt.Sprintf("        [dequeue] Received row: [%v]", x) )
 
 
 					} // for
 
+					syslogLog.Err("    [dequeue] Done iterating through result of query.")
 				}
+
 
 
 
