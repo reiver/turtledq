@@ -82,12 +82,25 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 				//DEBUG
 				syslogLog.Notice( fmt.Sprintf("    [dequeue] mongoQuery = [%v]", mongoQuery) )
 				
+				if nil != err {
+					syslogLog.Err( fmt.Sprintf("    [dequeue] Error querying MongoDB with mongoCriteria = [%v] received err = [%v]", mongoCriteria, err) )
+				} else {
 
-//				if nil != err {
-//					syslogLog.Err( fmt.Sprintf("    [dequeue] Error querying MongoDB with mongoCriteria = [%v] received err = [%v]", mongoCriteria, err) )
-//				} else {
-//
-//				}
+					var x struct{
+						when   time.Time
+						target string
+					}
+
+					items := mongoQuery.Iter()
+					for items.Next(&x) {
+
+						//DEBUG
+						syslogLog.Err( fmt.Sprintf("    [dequeue] Received row: [%v]", x) )
+
+
+					} // for
+
+				}
 
 
 
