@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-//	"github.com/streadway/amqp"
+	"github.com/streadway/amqp"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log/syslog"
@@ -70,7 +70,7 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 		mongoCollection := mongoSession.DB(mongoDatabaseName).C(mongoCollectionName)
 
 		//DEBUG
-		syslogLog.Notice("    [dequeue] Connect to MongoDB with %v.%v", mongoDatabaseName, mongoCollectionName)
+		syslogLog.Notice(  fmt.Sprintf("    [dequeue] Connect to MongoDB with %v.%v", mongoDatabaseName, mongoCollectionName)  )
 
 
 	// Connect to AMQP.
