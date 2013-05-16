@@ -14,7 +14,7 @@ import (
 
 
 
-func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string) {
+func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string, dequeueAmqpHref string) {
 
 	//DEBUG
 	syslogLog.Notice("[dequeue] BEGIN")
@@ -45,6 +45,14 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 			return
 		}
 
+		if "" == dequeueAmqpHref {
+			errMsg := fmt.Sprintf("    [dequeue] Bad dequeueAmqpHref. Received: [%v].", dequeueAmqpHref)
+			syslogLog.Err(errMsg)
+			panic(errMsg)
+/////////////////////// RETURN
+			return
+		}
+
 
 	// Connect to MongoDB
 		session, err := mgo.Dial(mongoHref)
@@ -58,8 +66,6 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 		// Optional. Switch the session to a monotonic behavior.
 		session.SetMode(mgo.Monotonic, true)
-
-
 
 		mongoCollection := session.DB(mongoDatabaseName).C(mongoCollectionName)
 
