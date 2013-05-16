@@ -18,6 +18,7 @@ type TurtleConfig struct {
 	DequeueMongoHref            string
 	DequeueMongoDatabaseName    string
 	DequeueMongoCollectionName  string
+	DequeueAmqpHref             string
 }
 
 
@@ -109,6 +110,13 @@ func NewTurtleConfigFromFile(syslogLog *syslog.Writer, configPath string) (*Turt
 			me.syslogLog.Notice("    [CONFIG] NO [deueue].mongo_collection_name")
 		} else {
 			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].mongo_collection_name = [%v]", me.DequeueMongoCollectionName)  )
+		}
+
+		me.DequeueAmqpHref, err = c.GetString("dequeue", "dequeue_amqp_href")
+		if nil != err {
+			me.syslogLog.Notice("    [CONFIG] NO [deueue].dequeue_amqp_href")
+		} else {
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [deueue].dequeue_amqp_href = [%v]", me.DequeueAmqpHref)  )
 		}
 
 
