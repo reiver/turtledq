@@ -129,12 +129,14 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 					syslogLog.Notice( fmt.Sprintf("    [dequeue] Success querying MongoDB with mongoCriteria = [%v]", mongoCriteria, err) )
 
-					var x struct{
-						_Id    bson.ObjectId
-						When   time.Time
-						Target string
-						Message map[string]interface{}
-					}
+//					var x struct{
+//						_Id    bson.ObjectId
+//						When   time.Time
+//						Target string
+//						Message map[string]interface{}
+//					}
+
+					x := map[string]interface{}{}
 
 					items := mongoQuery.Iter()
 					for items.Next(&x) {
@@ -143,12 +145,14 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 						syslogLog.Notice( fmt.Sprintf("        [dequeue] Received row: [%v]", x) )
 
 
-						routingKey := x.Target
+//						routingKey := x.Target
+						routingKey := x["target"].(string)
 
 						//DEBUG
 						syslogLog.Notice(  fmt.Sprintf("        [dequeue] Routing Key : [%v]", routingKey) )
 
-						body, err := json.Marshal(x.Message)
+//						body, err := json.Marshal(x.Message)
+						body, err := json.Marshal(x["message"])
 						if nil != err {
 							//DEBUG
 							syslogLog.Err(  fmt.Sprintf("        [dequeue] Error serializing body into JSON, received err = [%v]", err)  )
@@ -193,13 +197,16 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 
 						// Delete from MongoDB.
-							err = mongoCollection.RemoveId(x._Id)
+//							err = mongoCollection.RemoveId(x._Id)
+							err = mongoCollection.RemoveId(x["_id"])
 							if nil != err {
 								//DEBUG
-								syslogLog.Err(  fmt.Sprintf("        [dequeue] Could NOT remove item from Mongo with _id [%v], received err = [%v]", x._Id, err)  )
+//								syslogLog.Err(  fmt.Sprintf("        [dequeue] Could NOT remove item from Mongo with _id [%v], received err = [%v]", x._Id, err)  )
+								syslogLog.Err(  fmt.Sprintf("        [dequeue] Could NOT remove item from Mongo with _id [%v], received err = [%v]", x["_id"], err)  )
 							} else {
 								//DEBUG
-								syslogLog.Notice(  fmt.Sprintf("        [dequeue] Removed item from Mongo with _id [%v]", x._Id)  )
+//								syslogLog.Notice(  fmt.Sprintf("        [dequeue] Removed item from Mongo with _id [%v]", x._Id)  )
+								syslogLog.Notice(  fmt.Sprintf("        [dequeue] Removed item from Mongo with _id [%v]", x["_id"])  )
 							}
 
 
