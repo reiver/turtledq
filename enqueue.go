@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"github.com/bitly/go-simplejson"
 	"github.com/streadway/amqp"
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log/syslog"
 //	"math/rand"
-//	"time"
+	"time"
 )
 
 
@@ -103,6 +105,26 @@ func enqueue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 		//DEBUG
 		syslogLog.Notice(  fmt.Sprintf("    [enqueue] amqpChannel = [%v]", amqpChannel)  )
+
+
+
+	// Connect to MongoDB
+		mongoSession, err := mgo.Dial(mongoHref)
+		if err != nil {
+			syslogLog.Err(  fmt.Sprintf("    [enqueue] Could NOT connect to MongoDB at [%v], received err = [%v]", mongoHref, err)  )
+			panic(err)
+/////////////////////// RETURN
+			return
+		}
+		defer mongoSession.Close()
+
+		// Optional. Switch the session to a monotonic behavior.
+		mongoSession.SetMode(mgo.Monotonic, true)
+
+		mongoCollection := mongoSession.DB(mongoDatabaseName).C(mongoCollectionName)
+
+		//DEBUG
+		syslogLog.Notice(  fmt.Sprintf("    [enqueue] Connected to MongoDB with %v.%v", mongoDatabaseName, mongoCollectionName)  )
 
 
 
@@ -234,8 +256,16 @@ func enqueue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 				}
 
 
-//@TODO ###############################################################################################
 			// Enqueue the item
+				err = mongoCollection.Insert(
+					bson.M{
+						"target":  messageTarget,
+						"when":    time.Unix(messageWhen, 0),
+						"message": messageMessage}  )
+				if nil != err {
+					syslogLog.Err(  fmt.Sprintf("        [enqueue] ERROR Inserting into Mongo: [%v]", err)  )
+//@TODO ###############################################################################################
+				}
 
 
 
