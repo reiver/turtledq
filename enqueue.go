@@ -100,7 +100,7 @@ func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amq
 
 
 	// Set up AMQP consumer.
-		amqpDeliveries, err := c.channel.Consume(
+		amqpDeliveries, err := amqpChannel.Consume(
 			amqpQueue,  // name
 			"turtledq", // consumerTag
 			false,      // noAck
@@ -122,32 +122,54 @@ func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amq
 
 
 	// Forever
-		for {
-
+		for d := range amqpDeliveries {
 
 			//DEBUG
-			syslogLog.Notice("    [enqueue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-= LOOP")
+			syslogLog.Notice("        [enqueue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-= LOOP")
+			syslogLog.Notice( fmt.Sprintf("        [enqueue] got %dB message: [%v]", len(d.Body), d.DeliveryTag) )
+			syslogLog.Notice( fmt.Sprintf("        [enqueue] THING: [%v]", d) )
 
-
-			for d := range deliveries {
-
-
-
-                        //DEGUG
-                        syslogLog.Notice("    [HANDLE] =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= BEGIN")
-                        syslogLog.Notice( fmt.Sprintf("    [HANDLE] got %dB message: [%v]", len(d.Body), d.DeliveryTag) )
-                        syslogLog.Notice( fmt.Sprintf("    [HANDLE] THING: [%v]", d) )
 
 
                         sjson, err := simplejson.NewJson(d.Body)
                         if nil != err {
                                 //DEBUG
-                                syslogLog.Err( fmt.Sprintf("[HANDLE] Could NOT parse raw JSON: %v", d.Body) )
-//@TODO: ###########################################################################################
+                                syslogLog.Err( fmt.Sprintf("        [enqueue] Could NOT parse raw JSON: [%v]", d.Body) )
+//@TODO ##################################################################################################################
                         }
 
                         //DEBUG
-                        syslogLog.Notice( fmt.Sprintf("[HANDLE] json = [%#v]", sjson) )
+                        syslogLog.Notice( fmt.Sprintf("        [enqueue] json = [%#v]", sjson) )
+
+
+
+			haveTarget := true
+			messageTarget, err := sjson.Get("target").String()
+			if nil != err {
+				haveTarget = false
+			}
+
+			//DEBUG
+			if haveTarget {
+				syslogLog.Notice(  fmt.Sprintf("        [enqueue] target = [%v]", messageTarget)  )
+			} else {
+				syslogLog.Notice("        [enqueue] either do NOT have messageTarget (or did not receive a \"good\" one)")
+			}
+
+
+			haveWhen := true
+			messageWhen, err := sjson.Get("when").Int64()
+			if nil != err {
+				haveWhen = false
+			}
+
+			//DEBUG
+			if haveWhen {
+				syslogLog.Notice(  fmt.Sprintf("        [enqueue] target = [%v]", messageWhen)  )
+			} else {
+				syslogLog.Notice("        [enqueue] either do NOT have messageTarget (or did not receive a \"good\" one)")
+			}
+
 
 
 
