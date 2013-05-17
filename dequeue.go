@@ -124,7 +124,7 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 					syslogLog.Err( fmt.Sprintf("    [dequeue] Error querying MongoDB with mongoCriteria = [%v] received err = [%v]", mongoCriteria, err) )
 				} else {
 
-					syslogLog.Err( fmt.Sprintf("    [dequeue] Success querying MongoDB with mongoCriteria = [%v]", mongoCriteria, err) )
+					syslogLog.Notice( fmt.Sprintf("    [dequeue] Success querying MongoDB with mongoCriteria = [%v]", mongoCriteria, err) )
 
 					var x struct{
 						_Id    bson.ObjectId
@@ -136,14 +136,38 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 					for items.Next(&x) {
 
 						//DEBUG
-						syslogLog.Err( fmt.Sprintf("        [dequeue] Received row: [%v]", x) )
+						syslogLog.Notice( fmt.Sprintf("        [dequeue] Received row: [%v]", x) )
 
 
 
+						routingKey := x.Target
+//################################### TEST THAT THIS WORK. HAVE NOT SENT ANYTHING TO RABBITMQ YET.
+
+						if err = amqpChannel.Publish(
+							amqpExchange,   // publish to an exchange
+							routingKey, // routing to 0 or more queues
+							false,      // mandatory
+							false,      // immediate
+							amqp.Publishing{
+								Headers:         amqp.Table{},
+								ContentType:     "text/plain",
+								ContentEncoding: "",
+								Body:            []byte("{\"apple\":\"banana\",\"cherry\":5}"), // ################################################ TODO
+								DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
+								Priority:        0,              // 0-9
+								// a bunch of application/implementation-specific fields
+							},
+						); err != nil {
+
+							//DEBUG
+							syslogLog.Notice( fmt.Sprintf("        [dequeue] Error: Exchange Publish: [%v]", err) )
+						} else {
+
+						}
 
 					} // for
 
-					syslogLog.Err("    [dequeue] Done iterating through result of query.")
+					syslogLog.Notice("    [dequeue] Done iterating through result of query.")
 				}
 
 
