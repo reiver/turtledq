@@ -50,7 +50,12 @@ func main() {
 			turtleConfig.DequeueAmqpExchange,
 			turtleConfig.DequeueAmqpExchangeType)
 
-		go enqueue(syslogLog)
+		go enqueue(
+			syslogLog,
+			turtleConfig.EnqueueAmqpHref,
+			turtleConfig.EnqueueAmqpExchange,
+			turtleConfig.EnqueueAmqpExchangeType,
+			turtleConfig.EnqueueAmqpQueue)
 
 
 //	// Create ZeroMQ context.
