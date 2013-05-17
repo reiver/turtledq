@@ -22,6 +22,8 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 	syslogLog.Notice(  fmt.Sprintf("    [dequeue]   mongoDatabaseName = [%v]", mongoDatabaseName)  )
 	syslogLog.Notice(  fmt.Sprintf("    [dequeue] mongoCollectionName = [%v]", mongoCollectionName)  )
 	syslogLog.Notice(  fmt.Sprintf("    [dequeue]            amqpHref = [%v]", amqpHref)  )
+	syslogLog.Notice(  fmt.Sprintf("    [dequeue]        amqpExchange = [%v]", amqpExchange)  )
+	syslogLog.Notice(  fmt.Sprintf("    [dequeue]    amqpExchangeType = [%v]", amqpExchangeType)  )
 
 	// Deal with parameters.
 		if "" == mongoHref {
