@@ -140,9 +140,12 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 
 						routingKey := x.Target
+						body       := []byte("{\"apple\":\"banana\",\"cherry\":5}") // ################################################ TODO
+
 
 						//DEBUG
-						syslogLog.Notice( fmt.Sprintf("        [dequeue] Routing key: [%v]", routingKey) )
+						syslogLog.Notice(  fmt.Sprintf("        [dequeue] Routing key: [%v]", routingKey) )
+						syslogLog.Notice(  fmt.Sprintf("        [dequeue] declared Exchange, publishing %dB body (%s)", len(body), body)  )
 
 
 
@@ -155,7 +158,7 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 								Headers:         amqp.Table{},
 								ContentType:     "text/plain",
 								ContentEncoding: "",
-								Body:            []byte("{\"apple\":\"banana\",\"cherry\":5}"), // ################################################ TODO
+								Body:            body,
 								DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 								Priority:        0,              // 0-9
 								// a bunch of application/implementation-specific fields
