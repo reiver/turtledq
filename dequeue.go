@@ -139,9 +139,12 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 						syslogLog.Notice( fmt.Sprintf("        [dequeue] Received row: [%v]", x) )
 
 
-
 						routingKey := x.Target
-//################################### TEST THAT THIS WORK. HAVE NOT SENT ANYTHING TO RABBITMQ YET.
+
+						//DEBUG
+						syslogLog.Notice( fmt.Sprintf("        [dequeue] Routing key: [%v]", routingKey) )
+
+
 
 						if err = amqpChannel.Publish(
 							amqpExchange,   // publish to an exchange
@@ -160,9 +163,11 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 						); err != nil {
 
 							//DEBUG
-							syslogLog.Notice( fmt.Sprintf("        [dequeue] Error: Exchange Publish: [%v]", err) )
+							syslogLog.Err( fmt.Sprintf("        [dequeue] Error: Exchange Publish: [%v]", err) )
 						} else {
 
+							//DEBUG
+							syslogLog.Err("        [dequeue] Published")
 						}
 
 					} // for
