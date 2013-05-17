@@ -257,16 +257,18 @@ func enqueue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 
 			// Enqueue the item
-				err = mongoCollection.Insert(
-					bson.M{
+				mongoDoc := bson.M{
 						"target":  messageTarget,
 						"when":    time.Unix(messageWhen, 0),
-						"message": messageMessage}  )
+						"message": messageMessage}
+
+				err = mongoCollection.Insert(mongoDoc)
 				if nil != err {
 					syslogLog.Err(  fmt.Sprintf("        [enqueue] ERROR Inserting into Mongo: [%v]", err)  )
 //@TODO ###############################################################################################
 				}
 
+				syslogLog.Notice(  fmt.Sprintf("        [enqueue] Inserted into Mongo: [%v]", mongoDoc)  )
 
 
 
