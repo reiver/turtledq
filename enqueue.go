@@ -13,16 +13,43 @@ import (
 
 
 
-func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amqpExchangeType string, amqpQueue string) {
+func enqueue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName string, mongoCollectionName string, amqpHref string, amqpExchange string, amqpExchangeType string, amqpQueue string) {
 
 	//DEBUG
 	syslogLog.Notice("[enqueue] BEGIN")
-	syslogLog.Notice(  fmt.Sprintf("    [enqueue]            amqpHref = [%v]", amqpHref)  )
-	syslogLog.Notice(  fmt.Sprintf("    [enqueue]        amqpExchange = [%v]", amqpExchange)  )
-	syslogLog.Notice(  fmt.Sprintf("    [enqueue]    amqpExchangeType = [%v]", amqpExchangeType)  )
-	syslogLog.Notice(  fmt.Sprintf("    [enqueue]           amqpQueue = [%v]", amqpQueue)  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue]           mongoHref = [%v]", mongoHref            )  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue]   mongoDatabaseName = [%v]", mongoDatabaseName    )  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue] mongoCollectionName = [%v]", mongoCollectionName  )  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue]            amqpHref = [%v]", amqpHref             )  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue]        amqpExchange = [%v]", amqpExchange         )  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue]    amqpExchangeType = [%v]", amqpExchangeType     )  )
+	syslogLog.Notice(  fmt.Sprintf("    [enqueue]           amqpQueue = [%v]", amqpQueue            )  )
 
 	// Deal with parameters.
+		if "" == mongoHref {
+		errMsg := fmt.Sprintf("    [enqueue] Bad mongoHref. Received: [%v].", mongoHref)
+			syslogLog.Err(errMsg)
+			panic(errMsg)
+/////////////////////// RETURN
+			return
+		}
+
+		if "" == mongoDatabaseName {
+		errMsg := fmt.Sprintf("    [enqueue] Bad mongoHref. Received: [%v].", mongoDatabaseName)
+			syslogLog.Err(errMsg)
+			panic(errMsg)
+/////////////////////// RETURN
+			return
+		}
+
+		if "" == mongoCollectionName {
+		errMsg := fmt.Sprintf("    [enqueue] Bad mongoHref. Received: [%v].", mongoCollectionName)
+			syslogLog.Err(errMsg)
+			panic(errMsg)
+/////////////////////// RETURN
+			return
+		}
+
 		if "" == amqpHref {
 		errMsg := fmt.Sprintf("    [enqueue] Bad amqpHref. Received: [%v].", amqpHref)
 			syslogLog.Err(errMsg)
@@ -165,17 +192,28 @@ func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amq
 
 			//DEBUG
 			if haveWhen {
-				syslogLog.Notice(  fmt.Sprintf("        [enqueue] target = [%v]", messageWhen)  )
+				syslogLog.Notice(  fmt.Sprintf("        [enqueue] when = [%v]", messageWhen)  )
 			} else {
 				syslogLog.Notice("        [enqueue] either do NOT have messageTarget (or did not receive a \"good\" one)")
 			}
 
-//@TODO: message ############################################################3
 			haveMessage := true
+			messageMessage, err := sjson.Get("message").Map()
+			if nil != err {
+				haveMessage = false
+			}
+
+			//DEBUG
+			if haveMessage {
+				syslogLog.Notice(  fmt.Sprintf("        [enqueue] message = [%v]", messageMessage)  )
+			} else {
+				syslogLog.Notice("        [enqueue] either do NOT have messageMessage (or did not receive a \"good\" one)")
+			}
 
 
 
-			// Enqueue the item
+
+			// Deal with corrupted items.
 				if !haveTarget || !haveWhen || !haveMessage {
 
 				//DEBUG
@@ -197,6 +235,8 @@ func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amq
 
 
 //@TODO ###############################################################################################
+			// Enqueue the item
+
 
 
 
