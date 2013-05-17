@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"github.com/streadway/amqp"
+	"encoding/json"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log/syslog"
@@ -132,6 +133,7 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 						_Id    bson.ObjectId
 						When   time.Time
 						Target string
+						Message map[string]interface{}
 					}
 
 					items := mongoQuery.Iter()
@@ -142,7 +144,20 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 
 
 						routingKey := x.Target
-						body       := []byte("{\"apple\":\"banana\",\"cherry\":5}") // ################################################ TODO
+
+						//DEBUG
+						syslogLog.Notice(  fmt.Sprintf("        [dequeue] Routing Key : [%v]", routingKey) )
+
+						body, err := json.Marshal(x.Message)
+						if nil != err {
+							//DEBUG
+							syslogLog.Err(  fmt.Sprintf("        [dequeue] Error serializing body into JSON, received err = [%v]", err)  )
+//@TODO #############################################################################
+
+						}
+
+						//DEBUG
+						syslogLog.Notice(  fmt.Sprintf("        [dequeue] Body : [%v]", body) )
 
 
 						//DEBUG
