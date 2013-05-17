@@ -21,6 +21,10 @@ type TurtleConfig struct {
 	DequeueAmqpHref             string
 	DequeueAmqpExchange         string
 	DequeueAmqpExchangeType     string
+	EnqueueAmqpHref             string
+	EnqueueAmqpExchange         string
+	EnqueueAmqpExchangeType     string
+	EnqueueAmqpQueue            string
 }
 
 
@@ -133,6 +137,35 @@ func NewTurtleConfigFromFile(syslogLog *syslog.Writer, configPath string) (*Turt
 			me.syslogLog.Notice("    [CONFIG] NO [dequeue].amqp_exchange_type")
 		} else {
 			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [dequeue].amqp_exchange_type = [%v]", me.DequeueAmqpExchangeType)  )
+		}
+
+
+		me.EnqueueAmqpHref, err = c.GetString("enqueue", "amqp_href")
+		if nil != err {
+			me.syslogLog.Notice("    [CONFIG] NO [enqueue].amqp_href")
+		} else {
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [enqueue].amqp_href = [%v]", me.EnqueueAmqpHref)  )
+		}
+
+		me.EnqueueAmqpExchange, err = c.GetString("enqueue", "amqp_exchange")
+		if nil != err {
+			me.syslogLog.Notice("    [CONFIG] NO [enqueue].amqp_exchange")
+		} else {
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [enqueue].amqp_exchange = [%v]", me.EnqueueAmqpExchange)  )
+		}
+
+		me.EnqueueAmqpExchangeType, err = c.GetString("enqueue", "amqp_exchange_type")
+		if nil != err {
+			me.syslogLog.Notice("    [CONFIG] NO [enqueue].amqp_exchange_type")
+		} else {
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [enqueue].amqp_exchange_type = [%v]", me.EnqueueAmqpExchangeType)  )
+		}
+
+		me.EnqueueAmqpQueue, err = c.GetString("enqueue", "amqp_queue")
+		if nil != err {
+			me.syslogLog.Notice("    [CONFIG] NO [enqueue].amqp_queue")
+		} else {
+			me.syslogLog.Notice(  fmt.Sprintf("    [CONFIG] [enqueue].amqp_queue = [%v]", me.EnqueueAmqpQueue)  )
 		}
 
 
