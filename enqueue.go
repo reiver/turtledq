@@ -7,8 +7,8 @@ import (
 	"github.com/bitly/go-simplejson"
 	"github.com/streadway/amqp"
 	"log/syslog"
-	"math/rand"
-	"time"
+//	"math/rand"
+//	"time"
 )
 
 
@@ -170,16 +170,54 @@ func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amq
 				syslogLog.Notice("        [enqueue] either do NOT have messageTarget (or did not receive a \"good\" one)")
 			}
 
+//@TODO: message ############################################################3
+			haveMessage := true
+
+
+
+			// Enqueue the item
+				if !haveTarget || !haveWhen || !haveMessage {
+
+				//DEBUG
+				syslogLog.Notice("        [enqueue] Empty item from AMQP queue. Will ACK early and continue.")
+
+				// Ack.
+					err = d.Ack(false)
+					if nil != err {
+						syslogLog.Err(  fmt.Sprintf("        [enqueue] ERROR EARLY ACKing: [%v]", err)  )
+					}
+
+					//DEBUG
+					syslogLog.Notice("        [enqueue] EARLY ACKed")
+
+
+		/////////////////////// CONTINUE
+					continue
+				}
+
+
+//@TODO ###############################################################################################
 
 
 
 
-			sleepTime := time.Duration(5 + rand.Intn(7)) * time.Second
+			// Ack.
+				err = d.Ack(false)
+				if nil != err {
+					syslogLog.Err(  fmt.Sprintf("        [enqueue] ERROR ACKing: [%v]", err)  )
+				}
 
-			//DEBUG
-			syslogLog.Notice( fmt.Sprintf("    [enqueue] sleep for %v", sleepTime) )
+				//DEBUG
+				syslogLog.Notice("        [enqueue] ACKed")
 
-			time.Sleep(sleepTime)
+
+
+//			sleepTime := time.Duration(5 + rand.Intn(7)) * time.Second
+//
+//			//DEBUG
+//			syslogLog.Notice( fmt.Sprintf("    [enqueue] sleep for %v", sleepTime) )
+//
+//			time.Sleep(sleepTime)
 		} // for
 
 
