@@ -107,15 +107,15 @@ func main() {
 }
 
 
-func handleRequest(syslogLog *syslog.Writer, msg [][]byte) [][]byte {
-
-//@TODO
-	syslogLog.Notice( fmt.Sprintf("[handleRequest] msg = [%v]", msg) )
-
-
-	// Return
-//@TODO
-		return [][]byte{
-			[]byte("apple banana cherry"),
-		}
-}
+//func handleRequest(syslogLog *syslog.Writer, msg [][]byte) [][]byte {
+//
+////@TODO
+//	syslogLog.Notice( fmt.Sprintf("[handleRequest] msg = [%v]", msg) )
+//
+//
+//	// Return
+////@TODO
+//		return [][]byte{
+//			[]byte("apple banana cherry"),
+//		}
+//}
