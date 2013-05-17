@@ -190,6 +190,19 @@ func dequeue(syslogLog *syslog.Writer, mongoHref string, mongoDatabaseName strin
 							syslogLog.Err("        [dequeue] Published")
 						}
 
+
+
+						// Delete from MongoDB.
+							err = mongoCollection.RemoveId(x._Id)
+							if nil != err {
+								//DEBUG
+								syslogLog.Err(  fmt.Sprintf("        [dequeue] Could NOT remove item from Mongo with _id [%v], received err = [%v]", x._Id, err)  )
+							} else {
+								//DEBUG
+								syslogLog.Notice(  fmt.Sprintf("        [dequeue] Removed item from Mongo with _id [%v]", x._Id)  )
+							}
+
+
 					} // for
 
 					syslogLog.Notice("    [dequeue] Done iterating through result of query.")
