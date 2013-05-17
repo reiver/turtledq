@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bitly/go-simplejson"
 	"github.com/streadway/amqp"
 	"log/syslog"
 	"math/rand"
@@ -98,15 +99,56 @@ func enqueue(syslogLog *syslog.Writer, amqpHref string, amqpExchange string, amq
 		syslogLog.Notice("    [enqueue] Queue bound.")
 
 
+	// Set up AMQP consumer.
+		amqpDeliveries, err := c.channel.Consume(
+			amqpQueue,  // name
+			"turtledq", // consumerTag
+			false,      // noAck
+			false,      // exclusive
+			false,      // noLocal
+			false,      // noWait
+			nil,        // arguments
+		)
+		if err != nil {
+			syslogLog.Err(  fmt.Sprintf("    [enqueue] Could NOT get deliverables from queue [%v] on AMQP server (RabbitMQ?) at [%v], received err = [%v]", amqpQueue, amqpHref, err)  )
+			panic(err)
+/////////////////////// RETURN
+			return
+		}
+
+
+
 
 
 
 	// Forever
 		for {
 
+
 			//DEBUG
-			syslogLog.Notice("    [enqueue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=")
-			syslogLog.Notice("    [enqueue] loop")
+			syslogLog.Notice("    [enqueue] =-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-=-<>-= LOOP")
+
+
+			for d := range deliveries {
+
+
+
+                        //DEGUG
+                        syslogLog.Notice("    [HANDLE] =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= BEGIN")
+                        syslogLog.Notice( fmt.Sprintf("    [HANDLE] got %dB message: [%v]", len(d.Body), d.DeliveryTag) )
+                        syslogLog.Notice( fmt.Sprintf("    [HANDLE] THING: [%v]", d) )
+
+
+                        sjson, err := simplejson.NewJson(d.Body)
+                        if nil != err {
+                                //DEBUG
+                                syslogLog.Err( fmt.Sprintf("[HANDLE] Could NOT parse raw JSON: %v", d.Body) )
+//@TODO: ###########################################################################################
+                        }
+
+                        //DEBUG
+                        syslogLog.Notice( fmt.Sprintf("[HANDLE] json = [%#v]", sjson) )
+
 
 
 
